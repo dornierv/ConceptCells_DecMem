@@ -18,6 +18,12 @@ warnings.filterwarnings("ignore")
 from scipy import io as io
 from scipy import stats as stats
 
+
+
+# Path where to save fig
+path2fig = 'C:/Users/dornier/PhD/Article/Concept_Cells_temporal_pole/Figures/Figure1/Panel_Selectivity'
+ROI = 'tp'
+
 ###########################################################################
 ############ FUNCTIONS USED LATER IN THE MAIN SCRIPT ######################
 ###########################################################################
@@ -233,7 +239,7 @@ ax.tick_params(axis='both', which='major', labelsize=18)
 
 
 
-plt.savefig('C:/Users/dornier/PhD/Article/Concept_Cells_temporal_pole/Figures/Figure1/Panel_Selectivity/Histogram_Responsiveness_Neurons_TP_v4_Proportion.svg')
+plt.savefig(path2fig+'/Proportion_Responsiveness_Neuron'+ROI+'.svg')
 
 plt.show()
 plt.close()
