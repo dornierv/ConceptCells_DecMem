@@ -23,12 +23,27 @@ If you have questions please contact: vincent.dornier@cnrs.fr
 
 ## Requirements
 
-- Python 3
-- Numpy
-- Scipy
-- Matplotlib
-- Pandas
-- Pynapple
-- MNE
+- Python 3 (3.12)
+- Numpy (1.26.2)
+- Scipy (1.13.1)
+- Matplotlib (3.10.0)
+- Pandas (2.2.3)
+- Pynapple (0.8.5)
+- MNE (1.9.0)
+- Gensim (4.3.3)
+
+We recommend creating a new environment with conda by typing in the anaconda prompt:
+
+'''
+conda create -n decmem python=3.12.0
+'''
+
+
+## Code usage
+
+To reproduce analyses performed in the manuscript please download the folder as a ZIP file on your computer.
+Then unzip the file and launch script from the folder scripts with Python.
+
+
 
 
