@@ -32,11 +32,11 @@ If you have questions please contact: vincent.dornier@cnrs.fr
 - MNE (1.9.0)
 - Gensim (4.3.3)
 
-We recommend creating a new environment with conda by typing in the anaconda prompt:
+We recommend creating a new environment (e.g., decmem) with conda by typing for example in the anaconda prompt:
 
-'''
+```
 conda create -n decmem python=3.12.0
-'''
+```
 
 
 ## Code usage
