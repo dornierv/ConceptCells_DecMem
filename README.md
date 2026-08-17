@@ -16,3 +16,19 @@ Medical Research Council Centre of Research Excellence in Restorative Neural Dyn
 4. University of Toulouse, INSERM, ToNiC, Toulouse, France.
 5. Department of Neurology and Neurosurgery, Toulouse University Hospital, Toulouse, France.
 6. Marie & Louis Pasteur University, UMR 1322 INSERM, LINC, Besançon, France.
+
+
+If you have questions please contact: vincent.dornier@cnrs.fr
+
+
+## Requirements
+
+- Python 3
+- Numpy
+- Scipy
+- Matplotlib
+- Pandas
+- Pynapple
+- MNE
+
+
