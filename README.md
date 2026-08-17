@@ -38,6 +38,11 @@ We recommend creating a new environment (e.g., decmem) with conda by typing for 
 conda create -n decmem python=3.12.0
 ```
 
+Then you can install each specific version of the library with pip (with numpy here as an example):
+```
+pip install numpy==1.26.2
+```
+
 
 ## Code usage
 
