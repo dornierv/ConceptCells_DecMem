@@ -356,7 +356,7 @@ def corr_firingrate(id_patient,id_session,id_neuron):
         a=1
 
     # Keep only lower triangle         
-    corr_low_triangle = np.tril(corr_fr)
+    corr_low_triangle = np.tril(cosine_similarity)
 
     # Keep only lower triangle for cosine similarity
     cosine_similarity_low = cosine_similarity[corr_low_triangle !=0]
