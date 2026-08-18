@@ -24,7 +24,9 @@ from scipy import stats as stats
 
 
 
-
+# Inputs
+path2data = 'C:/Users/dornier/GitHub/ConceptCells_DecMem/'
+path2fig = 'C:/Users/dornier/GitHub/ConceptCells_DecMem/Selectivity/'
 
 
 #######################
@@ -104,6 +106,7 @@ def selectivity_neurons(path_json,M,response_type='all'):
     # General variable
     sr = 32768 # Sampling rate of Neuralynx system
 
+    # Initialize list to store the result
     selectivity = list()
 
     # Loop over patients having single-units in the temporal pole
@@ -122,8 +125,8 @@ def selectivity_neurons(path_json,M,response_type='all'):
 
 
             # Path where data is stored
-            data_path = r'F:\Screening\database/'+bsnm+'/sess-'+str(session)
-            path_images = data_path+'/stimuli/' #"E:/screening hors eeg/Screening images/Pool images/"
+            data_path = path2data+'data/Examples_Session/'+bsnm+'/sess-'+str(session)
+            path_images = data_path+'/stimuli/' 
 
             # Load logfile
             logfname=data_path+'/lfps/'+bsnm+'_ses-01_task-Screening_run-01_ieeg_log.txt'
@@ -132,27 +135,14 @@ def selectivity_neurons(path_json,M,response_type='all'):
 
             stream=np.arange(len(logLines)/25, dtype=int)*25+1
             chRegs=np.array([line.split('.')[0] for line in logLines[stream]])
-            nCh=chRegs.shape[0]
-            intermed_=logLines[6].split(' ')[1]
-            #print(chRegs,len(chRegs))
+            print(chRegs,len(chRegs))
 
-
+            # Load units from nwb
             spikes = load_spikes(data_path)
-
-            # Load Run Lists and get TTL associated with each image
-            test_mat_Run1 = io.loadmat(path_images+'run-01.mat') # et concaténer les 4 runs
-            my_array_Run1 = test_mat_Run1['trial']
-            keys_TTL = [my_array_Run1[0,i][1][0][0] for i in range(my_array_Run1.shape[1])] 
-            values_images = [my_array_Run1[0,i][2][0] for i in range(my_array_Run1.shape[1])] 
-            dict_TTL2Image = {k: v for k, v in zip(keys_TTL, values_images)}
-
-            
 
 
             # Load TTLs & dat files
-            folder_ttl = data_path+'/ttl'
-            #folder_TTL = dataFolder[:32]+'saveTTL/_TTLs4Python/s'+session+'/'
-            folder_TTL = folder_ttl+'/'
+            folder_TTL = data_path+'/ttl/'
             TTLvals = io.loadmat(folder_TTL+bsnm+'_TTLvals_tot.mat')['TTLvals_tot'][0]
             TS = io.loadmat(folder_TTL+bsnm+'_TS_tot.mat')['TS_tot'][0]
 
@@ -318,7 +308,7 @@ def calcul_selectivity(firing_rate,M):
 
 # Compute selectivity of neurons in the temporal pole
 try:
-    selectivity_tp = np.load('C:/Users/dornier/PhD/Article/Concept_Cells_temporal_pole/Figures/Figure5/Selectivity/selectivity_tp.npy')
+    selectivity_tp = np.load(path2data+'data/Selectivity/selectivity_tp.npy')
 except:
     selectivity_tp = selectivity_neurons(r'C:\Users\dornier\GitHub\ConceptCells_TP/dictionary_singleunits_tp.json',1000,response_type='increasing')
     np.save('C:/Users/dornier/PhD/Article/Concept_Cells_temporal_pole/Figures/Figure5/Selectivity/selectivity_tp.npy',selectivity_tp)
@@ -326,7 +316,7 @@ except:
 
 # Compute selectivity of neurons in the hippocampus
 try:
-    selectivity_hippocampus = np.load('C:/Users/dornier/PhD/Article/Concept_Cells_temporal_pole/Figures/Figure5/Selectivity/selectivity_hippocampus.npy')
+    selectivity_hippocampus = np.load(path2data+'data/Selectivity/selectivity_hippocampus.npy')
 except:
     selectivity_hippocampus = selectivity_neurons(r'C:\Users\dornier\GitHub\ConceptCells_TP/dictionary_singleunits_hippocampus.json',1000,response_type='increasing')
     np.save('C:/Users/dornier/PhD/Article/Concept_Cells_temporal_pole/Figures/Figure5/Selectivity/selectivity_hippocampus.npy',selectivity_hippocampus)
@@ -335,43 +325,18 @@ except:
 
 # Compute selectivity of neurons in the parahippocampal regions
 try:
-    selectivity_parahippocampal = np.load('C:/Users/dornier/PhD/Article/Concept_Cells_temporal_pole/Figures/Figure5/Selectivity/selectivity_parahippocampal.npy')
+    selectivity_parahippocampal = np.load(path2data+'data/Selectivity/selectivity_parahippocampal.npy')
 except: 
     selectivity_parahippocampal = selectivity_neurons(r'C:\Users\dornier\GitHub\ConceptCells_TP/dictionary_singleunits_parahippocampal.json',1000,response_type='increasing')
     np.save('C:/Users/dornier/PhD/Article/Concept_Cells_temporal_pole/Figures/Figure5/Selectivity/selectivity_parahippocampal.npy',selectivity_parahippocampal)
 
 # Compute selectivity of neurons in the PCC regions
 try:
-    selectivity_pcc = np.load('C:/Users/dornier/PhD/Article/Concept_Cells_temporal_pole/Figures/Figure5/Selectivity/selectivity_pcc.npy')
+    selectivity_pcc = np.load(path2data+'data/Selectivity/selectivity_pcc.npy')
 except: 
     selectivity_pcc = selectivity_neurons(r'C:\Users\dornier\GitHub\ConceptCells_TP/dictionary_singleunits_pcc.json',1000,response_type='increasing')
     np.save('C:/Users/dornier/PhD/Article/Concept_Cells_temporal_pole/Figures/Figure5/Selectivity/selectivity_pcc.npy',selectivity_pcc)
 
-
-
-
-
-
-#####################
-# Compute statistics
-#####################
-diff_tp_hipp = stats.mannwhitneyu(selectivity_tp,selectivity_hippocampus)
-print('La p-value entre TP et l hippocampe est de : ' + str(diff_tp_hipp[1]))
-
-
-
-diff_tp_parahippocampal = stats.mannwhitneyu(selectivity_tp,selectivity_parahippocampal)
-print('\n La p-value entre TP et le cortex parahippocampique est de : ' + str(diff_tp_parahippocampal[1]))
-
-
-
-diff_hippocampus_parahippocampal = stats.mannwhitneyu(selectivity_hippocampus,selectivity_parahippocampal)
-print('\n La p-value entre hippocampe et le parahippocampe est de : ' + str(diff_hippocampus_parahippocampal[1]))
-
-
-
-diff_tp_pcc = stats.mannwhitneyu(selectivity_tp,selectivity_pcc)
-print('\n La p-value entre TP et le PCC est de : ' + str(diff_tp_pcc[1]))
 
 
 
@@ -412,7 +377,7 @@ ax.scatter(np.random.normal(2 + 1, 0.04, len(selectivity_parahippocampal)),selec
 ax.scatter(np.random.normal(3 + 1, 0.04, len(selectivity_pcc)),selectivity_pcc,color='grey',alpha=0.4)
 
 
-plt.savefig('C:/Users/dornier/PhD/Article/Concept_Cells_temporal_pole/Figures/Figure5/Selectivity/Boxplot_Selectivity_All_ROI_v5.svg')
+plt.savefig(path2fig+'Boxplot_Selectivity_All_ROI.svg')
 plt.show()
 
 plt.close()
