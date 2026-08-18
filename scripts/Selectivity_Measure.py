@@ -311,7 +311,7 @@ try:
     selectivity_tp = np.load(path2data+'data/Selectivity/selectivity_tp.npy')
 except:
     selectivity_tp = selectivity_neurons(r'C:\Users\dornier\GitHub\ConceptCells_TP/dictionary_singleunits_tp.json',1000,response_type='increasing')
-    np.save('C:/Users/dornier/PhD/Article/Concept_Cells_temporal_pole/Figures/Figure5/Selectivity/selectivity_tp.npy',selectivity_tp)
+    np.save(path2data+'data/Selectivity/selectivity_tp.npy',selectivity_tp)
 
 
 # Compute selectivity of neurons in the hippocampus
@@ -319,7 +319,7 @@ try:
     selectivity_hippocampus = np.load(path2data+'data/Selectivity/selectivity_hippocampus.npy')
 except:
     selectivity_hippocampus = selectivity_neurons(r'C:\Users\dornier\GitHub\ConceptCells_TP/dictionary_singleunits_hippocampus.json',1000,response_type='increasing')
-    np.save('C:/Users/dornier/PhD/Article/Concept_Cells_temporal_pole/Figures/Figure5/Selectivity/selectivity_hippocampus.npy',selectivity_hippocampus)
+    np.save(path2data+'data/Selectivity/selectivity_hippocampus.npy',selectivity_hippocampus)
 
 
 
@@ -328,14 +328,14 @@ try:
     selectivity_parahippocampal = np.load(path2data+'data/Selectivity/selectivity_parahippocampal.npy')
 except: 
     selectivity_parahippocampal = selectivity_neurons(r'C:\Users\dornier\GitHub\ConceptCells_TP/dictionary_singleunits_parahippocampal.json',1000,response_type='increasing')
-    np.save('C:/Users/dornier/PhD/Article/Concept_Cells_temporal_pole/Figures/Figure5/Selectivity/selectivity_parahippocampal.npy',selectivity_parahippocampal)
+    np.save(path2data+'data/Selectivity/selectivity_parahippocampal.npy',selectivity_parahippocampal)
 
 # Compute selectivity of neurons in the PCC regions
 try:
     selectivity_pcc = np.load(path2data+'data/Selectivity/selectivity_pcc.npy')
 except: 
     selectivity_pcc = selectivity_neurons(r'C:\Users\dornier\GitHub\ConceptCells_TP/dictionary_singleunits_pcc.json',1000,response_type='increasing')
-    np.save('C:/Users/dornier/PhD/Article/Concept_Cells_temporal_pole/Figures/Figure5/Selectivity/selectivity_pcc.npy',selectivity_pcc)
+    np.save(path2data+'data/Selectivity/selectivity_pcc.npy',selectivity_pcc)
 
 
 
