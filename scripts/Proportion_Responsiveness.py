@@ -21,8 +21,9 @@ from scipy import stats as stats
 
 
 # Path where to save fig
-path2fig = 'C:/Users/dornier/PhD/Article/Concept_Cells_temporal_pole/Figures/Figure1/Panel_Selectivity'
-ROI = 'tp'
+path2data = 'path2folder'
+path2fig = 'path2fig'
+ROI = 'TP'
 
 ###########################################################################
 ############ FUNCTIONS USED LATER IN THE MAIN SCRIPT ######################
@@ -122,10 +123,9 @@ def proportion_response(path_json):
 
 
             # Path where data is stored
-            data_path = r'D:\Screening\database/'+bsnm+'/sess-'+str(session)
-            path_images = data_path+'/stimuli/' #"E:/screening hors eeg/Screening images/Pool images/"
-            
+            data_path = r'F:\Screening\database/'+bsnm+'/sess-'+str(session) # Change path
 
+            
             # Load logfile
             logfname=data_path+'/lfps/'+bsnm+'_ses-01_task-Screening_run-01_ieeg_log.txt'
             logLines=np.array(read_lines(logfname, removeEndLines=True))
@@ -224,10 +224,10 @@ def proportion_response(path_json):
 
 # Get the mean firing rate for all neurons in TP responsive
 try:
-    nb_response_neuron = np.load('C:/Users/dornier/PhD/Article/Concept_Cells_temporal_pole/Figures/Figure1/Panel_Selectivity/Nb_Response_TP_Pourcentage.npy')
+    nb_response_neuron = np.load(path2data+'/data/Responsiveness/Percentage_Response_'+ROI+'.npy')
 except:
-    nb_response_neuron = proportion_response("C:/Users/dornier/GitHub/ConceptCells_TP/dictionary_singleunits_tp.json")
-    np.save('C:/Users/dornier/PhD/Article/Concept_Cells_temporal_pole/Figures/Figure1/Panel_Selectivity/Nb_Response_TP_Pourcentage.npy',nb_response_neuron)
+    nb_response_neuron = proportion_response("C:/Users/dornier/GitHub/ConceptCells_DecMem/data/Examples_Session/dictionary_singleunits_example.json")
+    np.save('C:/Users/dornier/GitHub/ConceptCells_DecMem/data/Examples_Session/Selectivity/Example_Selectivity.npy',nb_response_neuron)
 
 # Plot
 fig,ax = plt.subplots(figsize=(12,6),layout='constrained')
