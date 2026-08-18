@@ -12,13 +12,8 @@ in single neurons of the human medial temporal lobe. Nature Communications, 6, 8
 
 This script is used to do Fig. 5b
 '''
-
-import scipy.signal as sig
-
-
-
-
 # Import libraries
+import scipy.signal as sig
 import pynapple as nap
 import json
 import re 
@@ -28,17 +23,18 @@ import pynapple as nap
 import matplotlib.pyplot as plt
 import mne
 import seaborn as sns
-import math
-import scipy
-import astropy
 from scipy.ndimage import gaussian_filter
 from astropy.convolution import Gaussian1DKernel, convolve
 import itertools
 import seaborn as sns
 import pandas as pd
-
 from scipy import io as io
 from scipy import stats as stats
+
+
+# Input 
+path2data = 'C:/Users/dornier/GitHub/ConceptCells_DecMem/' # Replace by the path where you store folder
+path2figure = 'C:/Users/dornier/GitHub/ConceptCells_DecMem/data/Latency/'
 
 ################################################################
 ############## FUNCTIONS USED LATER IN THE SCRIPT ##############
@@ -105,7 +101,7 @@ def get_firingrate(perievent):
 
 
 def onset_neurons(path_json):
-    # Open the dictionary containing all single-units registered in the temporal pole
+    # Open the dictionary containing all single-units recorded in the region of interest
     with open(path_json, "r") as f:
         neurons_tp = json.load(f)
 
@@ -117,7 +113,7 @@ def onset_neurons(path_json):
     # General variable
     sr = 32768 # Sampling rate of Neuralynx system
 
-
+    # Initialize list to store data
     onset_neuron_list = list()
 
     # Loop over patients having single-units in the temporal pole
@@ -136,26 +132,15 @@ def onset_neurons(path_json):
 
 
             # Path where data is stored
-            data_path = r'F:\Screening\database/'+bsnm+'/sess-'+str(session)
+            data_path = path2data+'data/Examples_Session/'+bsnm+'/sess-'+str(session)
             path_images = data_path+'/stimuli/' #"E:/screening hors eeg/Screening images/Pool images/"
-            path_results = 'F:/Screening/results/Plot_Population_TP/'
 
-
-            # Check whether the specified path exists or not
-            isExist = os.path.exists(path_results)
-            if not isExist:
-                # Create a new directory because it does not exist
-                os.makedirs(path_results)
 
             # Load logfile
             logfname=data_path+'/lfps/'+bsnm+'_ses-01_task-Screening_run-01_ieeg_log.txt'
-
             logLines=np.array(read_lines(logfname, removeEndLines=True))
-
             stream=np.arange(len(logLines)/25, dtype=int)*25+1
             chRegs=np.array([line.split('.')[0] for line in logLines[stream]])
-            nCh=chRegs.shape[0]
-            intermed_=logLines[6].split(' ')[1]
             print(chRegs,len(chRegs))
 
 
@@ -166,15 +151,11 @@ def onset_neurons(path_json):
             my_array_Run1 = test_mat_Run1['trial']
             keys_TTL = [my_array_Run1[0,i][1][0][0] for i in range(my_array_Run1.shape[1])] 
             values_images = [my_array_Run1[0,i][2][0] for i in range(my_array_Run1.shape[1])] 
-            dict_TTL2Image = {k: v for k, v in zip(keys_TTL, values_images)}
 
-            
 
 
             # Load TTLs & dat files
-            folder_ttl = data_path+'/ttl'
-            #folder_TTL = dataFolder[:32]+'saveTTL/_TTLs4Python/s'+session+'/'
-            folder_TTL = folder_ttl+'/'
+            folder_TTL = data_path+'/ttl/'
             TTLvals = io.loadmat(folder_TTL+bsnm+'_TTLvals_tot.mat')['TTLvals_tot'][0]
             TS = io.loadmat(folder_TTL+bsnm+'_TS_tot.mat')['TS_tot'][0]
 
@@ -184,7 +165,7 @@ def onset_neurons(path_json):
 
 
             # Get TTLs sync with EEG
-            TS_32768 = np.searchsorted(TS_stream, TS, side='left') # index temps absolu
+            TS_32768 = np.searchsorted(TS_stream, TS, side='left') # Extract samples
             TS_32768[TS_32768 ==len(TS_stream)] = len(TS_stream)-1
 
 
@@ -194,22 +175,19 @@ def onset_neurons(path_json):
             imgs=np.unique(TTLvals)
             imgIndices=[np.where(TTLvals==img_)[0] for img_ in imgs]
 
-
+            # Extract samples when stimuli were presented
             imgTS=[TS_32768[imgIndice] for imgIndice in imgIndices]
 
             # Suppress the first value that correspond to TTL = 0 (i.e., fixation cross)
             imgTS = imgTS[1:]
 
+            # Extract list of neurons in the session
             list_neurons = neurons_tp[iPatient][0][iSession]
 
             # Loop over neurons of interest
             if list_neurons:
                 for iNeuron in list_neurons:
                     
-
-
-                    
-
                     onset_image = list()
                     for TimingImage in imgTS:
                         Image_Second = TimingImage/sr
@@ -231,7 +209,7 @@ def onset_neurons(path_json):
 
                         baseline_rate_trial = firing_rate[:,0:100]
                         
-
+                        # Cluster-based permutation test
                         F_obs, clusters, clusters_pv,H0 = mne.stats.permutation_cluster_test([baseline_rate_trial,firing_rate_trial]) 
 
 
@@ -326,168 +304,92 @@ def onset_neurons(path_json):
     
     return onset_neuron_list
                         
+#####################
+#### MAIN SCRIPT ####
+#####################
 
-
+# For neurons in the temporal pole
 try:
-    poisson_tp = np.load('C:/Users/dornier/PhD/Article/Concept_Cells_temporal_pole/Figures/Figure5/Latency/Latency_Leila_TP.npy')
+    poisson_tp = np.load(path2data+'data/Latency/Latency_TP.npy')
 except:
     poisson_tp = onset_neurons(r"C:\Users\dornier\GitHub\ConceptCells_TP/dictionary_singleunits_tp_latency.json")
-    np.save('C:/Users/dornier/PhD/Article/Concept_Cells_temporal_pole/Figures/Figure5/Latency/Latency_Leila_TP.npy',poisson_tp)
+    np.save(path2data+'data/Latency/Latency_TP.npy',poisson_tp)
 
 
 # For neurons in the hippocampus
 try:
-    poisson_hipp = np.load('C:/Users/dornier/PhD/Article/Concept_Cells_temporal_pole/Figures/Figure5/Latency/Latency_Leila_Hippocampus.npy')
+    poisson_hipp = np.load(path2data+'data/Latency/Latency_Hippocampus.npy')
 except:
     poisson_hipp = onset_neurons(r"C:\Users\dornier\GitHub\ConceptCells_TP/dictionary_singleunits_hippocampus.json")
-    np.save('C:/Users/dornier/PhD/Article/Concept_Cells_temporal_pole/Figures/Figure5/Latency/Latency_Leila_Hippocampus.npy',poisson_hipp)
+    np.save(path2data+'data/Latency/Latency_Hippocampus.npy',poisson_hipp)
 
 
 # For neurons in GPH
 try:
-    poisson_gph = np.load('C:/Users/dornier/PhD/Article/Concept_Cells_temporal_pole/Figures/Figure5/Latency/Latency_Leila_GPH.npy')
+    poisson_gph = np.load(path2data+'data/Latency/Latency_Parahippocampal.npy')
 except:
     poisson_gph = onset_neurons(r"C:\Users\dornier\GitHub\ConceptCells_TP/dictionary_singleunits_parahippocampal.json")
-    np.save('C:/Users/dornier/PhD/Article/Concept_Cells_temporal_pole/Figures/Figure5/Latency/Latency_Leila_GPH.npy',poisson_gph)
+    np.save(path2data+'data/Latency/Latency_Parahippocampal.npy',poisson_gph)
 
 
-# For neurons in rhinal cortex
+# For neurons in PCC
 try: 
-    poisson_rhinal = np.load('C:/Users/dornier/PhD/Article/Concept_Cells_temporal_pole/Figures/Figure5/Latency/Latency_Leila_Rhinal.npy')
-except: 
-    poisson_rhinal = onset_neurons(r"C:\Users\dornier\GitHub\ConceptCells_TP/dictionary_singleunits_rhinal_cortex.json")
-    np.save('C:/Users/dornier/PhD/Article/Concept_Cells_temporal_pole/Figures/Figure5/Latency/Latency_Leila_Rhinal.npy',poisson_rhinal)
-
-
-# For neurons in amygdala
-try: 
-    poisson_amygdala = np.load('C:/Users/dornier/PhD/Article/Concept_Cells_temporal_pole/Figures/Figure5/Latency/Latency_Leila_Amygdala.npy')
-except: 
-    poisson_amygdala = onset_neurons(r"C:\Users\dornier\GitHub\ConceptCells_TP/dictionary_singleunits_amygdala.json")
-    np.save('C:/Users/dornier/PhD/Article/Concept_Cells_temporal_pole/Figures/Figure5/Latency/Latency_Leila_Amygdala.npy',poisson_amygdala)
-
-
-# For neurons in pcc
-try: 
-    poisson_pcc = np.load('C:/Users/dornier/PhD/Article/Concept_Cells_temporal_pole/Figures/Figure5/Latency/Latency_Leila_PCC.npy')
+    poisson_pcc = np.load(path2data+'data/Latency/Latency_PCC.npy')
 except: 
     poisson_pcc = onset_neurons(r"C:\Users\dornier\GitHub\ConceptCells_TP/dictionary_singleunits_pcc.json")
-    np.save('C:/Users/dornier/PhD/Article/Concept_Cells_temporal_pole/Figures/Figure5/Latency/Latency_Leila_PCC.npy',poisson_pcc)
+    np.save(path2data+'data/Latency/Latency_PCC.npy',poisson_pcc)
 
 
-# Statistical part
-kruskal_wallis = stats.kruskal(poisson_tp,poisson_hipp,poisson_rhinal,poisson_gph, poisson_amygdala, poisson_pcc)
-er
 
-print('Kruskal-wallis = '+str(kruskal_wallis.statistic)+', p = '+str(kruskal_wallis.pvalue))
-
-# two-by-two comparisons
-tp_hippocampus = stats.mannwhitneyu(poisson_tp,poisson_hipp)
-print('\nTP vs Hippocampus = '+str(tp_hippocampus.statistic)+', p = '+str(tp_hippocampus.pvalue))
-
-
-tp_gph = stats.mannwhitneyu(poisson_tp,poisson_gph)
-print('\nTP vs GPH = '+str(tp_gph.statistic)+', p = '+str(tp_gph.pvalue))
-
-
-tp_rhinal = stats.mannwhitneyu(poisson_tp,poisson_rhinal)
-print('\nTP vs Rhinal = '+str(tp_rhinal.statistic)+', p = '+str(tp_rhinal.pvalue))
-
-tp_amygdala = stats.mannwhitneyu(poisson_tp,poisson_amygdala)
-print('\nTP vs Amygdala = '+str(tp_amygdala.statistic)+', p = '+str(tp_amygdala.pvalue))
-
-tp_pcc = stats.mannwhitneyu(poisson_tp,poisson_pcc)
-print('\nTP vs PCC = '+str(tp_pcc.statistic)+', p = '+str(tp_pcc.pvalue))
 
 # Plot 
 # Plot part
 
-
-plot = 'ridgeline'
-
-if plot == 'ridgeline':
-
-    # Transform our arrays into pandas dataframe
-    df_tp = pd.DataFrame({'TP': poisson_tp})
-    df_gph = pd.DataFrame({'Parahippocampal': poisson_gph})
-    df_rhinal = pd.DataFrame({'Rhinal': poisson_rhinal})
-    df_hippocampus = pd.DataFrame({'Hippocampus': poisson_hipp})
-    df_amygdala = pd.DataFrame({'Amygdala': poisson_amygdala})
-    df_pcc = pd.DataFrame({'PCC': poisson_pcc})
-
-    
-    df_roi = pd.concat([df_tp,df_gph,df_rhinal,df_hippocampus,df_amygdala,df_pcc], axis=1) 
-    df_roi = pd.concat([df_tp,df_gph,df_hippocampus,df_amygdala,df_pcc], axis=1) 
+# Transform our arrays into pandas dataframe
+df_tp = pd.DataFrame({'TP': poisson_tp})
+df_gph = pd.DataFrame({'Parahippocampal': poisson_gph})
+df_hippocampus = pd.DataFrame({'Hippocampus': poisson_hipp})
+df_pcc = pd.DataFrame({'PCC': poisson_pcc})
 
 
-    #fig, (ax1,ax2,ax3,ax4,ax5,ax6) = plt.subplots(6,1,figsize=(8,3),sharex=True)
-    fig, (ax1,ax2,ax3,ax4) = plt.subplots(4,1,figsize=(8,3),sharex=True)
+# Concat all dataframes
+df_roi = pd.concat([df_tp,df_gph,df_hippocampus,df_pcc], axis=1) 
 
 
+# Figure
+fig, (ax1,ax2,ax3,ax4) = plt.subplots(4,1,figsize=(8,3),sharex=True)
+fig.subplots_adjust(hspace=-0.7)
 
-    fig.subplots_adjust(hspace=-0.7)
-
-    ax1 = sns.kdeplot(data=df_roi, x='Parahippocampal',fill=True,ax=ax1,color='sandybrown')
-    ax1.set_axis_off()
-
-
-    ax2 = sns.kdeplot(data=df_roi, x='TP',fill=True,ax=ax2,color='palevioletred')
-
-    ax2.set_axis_off()
-
-    # ax3 = sns.kdeplot(data=df_roi, x='Rhinal',fill=True,ax=ax3,color='seagreen')
-    # ax3.set_axis_off()
-
-    ax3 = sns.kdeplot(data=df_roi, x='Hippocampus',fill=True,ax=ax3,color='darkslateblue')
-    ax3.set_axis_off()
-
-    ax4 = sns.kdeplot(data=df_roi, x='PCC',fill=True,ax=ax4,color='cornflowerblue')
-    #ax4.set_axis_off()
+ax1 = sns.kdeplot(data=df_roi, x='Parahippocampal',fill=True,ax=ax1,color='sandybrown')
+ax1.set_axis_off()
 
 
-    #ax5 = sns.kdeplot(data=df_roi, x='PCC',fill=True,ax=ax5,color='cornflowerblue')
-    
+ax2 = sns.kdeplot(data=df_roi, x='TP',fill=True,ax=ax2,color='palevioletred')
+ax2.set_axis_off()
 
-    back6 = ax4.patch
-    back6.set_alpha(0)
-    # remove borders, axis ticks, and labels
-    ax4.set_yticklabels([])
-    ax4.set_ylabel('')
-    ax4.set_xlabel('Onset time (ms)')
+
+ax3 = sns.kdeplot(data=df_roi, x='Hippocampus',fill=True,ax=ax3,color='darkslateblue')
+ax3.set_axis_off()
+
+ax4 = sns.kdeplot(data=df_roi, x='PCC',fill=True,ax=ax4,color='cornflowerblue')
+
+back6 = ax4.patch
+back6.set_alpha(0)
+# remove borders, axis ticks, and labels
+ax4.set_yticklabels([])
+ax4.set_ylabel('')
+ax4.set_xlabel('Onset time (ms)')
 
 
 
-    spines = ["top","right","left"]
-    for s in spines:
-        ax4.spines[s].set_visible(False)
+spines = ["top","right","left"]
+for s in spines:
+    ax4.spines[s].set_visible(False)
 
-    fig.legend(labels=['Parahippocampal','TP','Hippocampus','PCC'])
-    ax1.set_title('Onset time for each region')
-    
-    plt.savefig('C:/Users/dornier/PhD/Article/Concept_Cells_temporal_pole/Figures/Figure5/Latency/Ridgelineplot_OnsetLatencies_All_Regions_v3.svg')
+fig.legend(labels=['Parahippocampal','TP','Hippocampus','PCC'])
+ax1.set_title('Onset time for each region')
+
+plt.savefig(path2figure+'/Distribution_Onset_Latencies.svg')
 
 
-elif plot == 'histogram':
 
-    
-
-    fig, (ax1,ax2,ax3,ax4,ax5,ax6) = plt.subplots(1,6,layout='constrained', figsize=(16,7.5), sharey=True) 
-    ax2.hist(poisson_tp,bins=20,color='palevioletred',range=(0,1000),alpha=0.6)
-    ax2.set_title('Temporal pole',fontsize=17)
-    ax1.set_xlabel('Onset time (ms)',fontsize=15)
-    ax1.set_ylabel('Number of units',fontsize=15)
-    ax4.hist(poisson_hipp,bins=20,color='darkslateblue',range=(0,1000),alpha=0.6)
-    ax4.set_title('Hippocampus',fontsize=17)
-    ax3.hist(poisson_rhinal,bins=20,color='seagreen',range=(0,1000),alpha=0.6)
-    ax3.set_title('Rhinal cortex',fontsize=17)
-    ax1.hist(poisson_gph,bins=20,color='sandybrown',range=(0,1000),alpha=0.9)
-    ax1.set_title('Parahippocampal',fontsize=17)
-    ax5.hist(poisson_amygdala,bins=20,color='saddlebrown',range=(0,1000),alpha=0.6)
-    ax5.set_title('Amygdala',fontsize=17)
-    ax6.hist(poisson_pcc,bins=20,color='cornflowerblue',range=(0,1000),alpha=0.6)
-    ax6.set_title('PCC',fontsize=17)
-    plt.savefig('C:/Users/dornier/PhD/Article/Concept_Cells_temporal_pole/Figures/Figure5/Latency/Distribution_Leila_Latencies_v4.svg')
-    plt.show()
-    plt.close()
-
-    print('ALL DONE')
