@@ -100,6 +100,7 @@ Each function can be launched on its own except for Jupyter Notebook (.ipynb) th
 
 
 If you use the code presented here please cite:
+
 Dornier et al., A distributed and hierarchical organization of concept cells in the human declarative memory system
 
 
