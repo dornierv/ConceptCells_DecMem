@@ -21,7 +21,7 @@ from scipy import stats as stats
 
 
 # Path where to save fig
-path2data = 'path2folder'
+path2data = 'C:/Users/dornier/GitHub/ConceptCells_DecMem/'
 path2fig = 'path2fig'
 ROI = 'TP'
 
@@ -123,7 +123,7 @@ def proportion_response(path_json):
 
 
             # Path where data is stored
-            data_path = r'F:\Screening\database/'+bsnm+'/sess-'+str(session) # Change path
+            data_path = path2data+'/data/Examples_Session/'+bsnm+'/sess-'+str(session) # Change path
 
             
             # Load logfile
@@ -226,8 +226,8 @@ def proportion_response(path_json):
 try:
     nb_response_neuron = np.load(path2data+'/data/Responsiveness/Percentage_Response_'+ROI+'.npy')
 except:
-    nb_response_neuron = proportion_response("C:/Users/dornier/GitHub/ConceptCells_DecMem/data/Examples_Session/dictionary_singleunits_example.json")
-    np.save('C:/Users/dornier/GitHub/ConceptCells_DecMem/data/Examples_Session/Selectivity/Example_Selectivity.npy',nb_response_neuron)
+    nb_response_neuron = proportion_response(path2data+"data/Examples_Session/dictionary_singleunits_example.json")
+    np.save(path2data+'/data/Examples_Session/Selectivity/Example_Selectivity.npy',nb_response_neuron)
 
 # Plot
 fig,ax = plt.subplots(figsize=(12,6),layout='constrained')
