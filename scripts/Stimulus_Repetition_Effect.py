@@ -10,12 +10,9 @@ For now I only keep sessions where 8 stimuli were presented to have consistency
 
 This script has been used to do Fig. 4g, Extended Data Fig. 5h
 '''
-
-
+# Import libraries needed
 import warnings
 warnings.filterwarnings("ignore")
-
-# Import libraries needed
 import json 
 import re 
 import numpy as np
@@ -24,11 +21,12 @@ import pynapple as nap
 import matplotlib.pyplot as plt
 import mne
 import seaborn as sns
-from statsmodels.sandbox.stats.multicomp import multipletests
-
-
 from scipy import io as io
 from scipy import stats as stats
+
+# Inputs
+path2data = 'C:/Users/dornier/GitHub/ConceptCells_DecMem/'
+path2save = 'C:/Users/dornier/GitHub/ConceptCells_DecMem/data/Repetition_Effect/'
 
 ###########################################################################
 ############ FUNCTIONS USED LATER IN THE MAIN SCRIPT ######################
@@ -105,9 +103,7 @@ def get_repetition_spikes(path_json):
     # General variable
     sr = 32768 # Sampling rate of Neuralynx system
 
-    all_fr_images = list()
-    fr_neurons = list()
-    fr_neurons_image = np.zeros((1,200))
+
 
     repetition_score = []
 
@@ -127,16 +123,9 @@ def get_repetition_spikes(path_json):
 
 
             # Path where data is stored
-            data_path = r'F:\Screening\database/'+bsnm+'/sess-'+str(session)
+            data_path = path2data+'/data/Examples_Session/'+bsnm+'/sess-'+str(session)
             path_images = data_path+'/stimuli/' #"E:/screening hors eeg/Screening images/Pool images/"
-            path_results = 'F:/Screening/results/Plot_Population_TP/'
-
-
-            # Check whether the specified path exists or not
-            isExist = os.path.exists(path_results)
-            if not isExist:
-                # Create a new directory because it does not exist
-                os.makedirs(path_results)
+            
 
             # Load logfile
             logfname=data_path+'/lfps/'+bsnm+'_ses-01_task-Screening_run-01_ieeg_log.txt'
@@ -157,15 +146,11 @@ def get_repetition_spikes(path_json):
             my_array_Run1 = test_mat_Run1['trial']
             keys_TTL = [my_array_Run1[0,i][1][0][0] for i in range(my_array_Run1.shape[1])] 
             values_images = [my_array_Run1[0,i][2][0] for i in range(my_array_Run1.shape[1])] 
-            dict_TTL2Image = {k: v for k, v in zip(keys_TTL, values_images)}
-
             
 
 
             # Load TTLs & dat files
-            folder_ttl = data_path+'/ttl'
-            #folder_TTL = dataFolder[:32]+'saveTTL/_TTLs4Python/s'+session+'/'
-            folder_TTL = folder_ttl+'/'
+            folder_TTL = data_path+'/ttl/'
             TTLvals = io.loadmat(folder_TTL+bsnm+'_TTLvals_tot.mat')['TTLvals_tot'][0]
             TS = io.loadmat(folder_TTL+bsnm+'_TS_tot.mat')['TS_tot'][0]
 
@@ -269,27 +254,27 @@ def get_repetition_spikes(path_json):
 
 # Get the number of spikes across repetitions
 try:
-    repetition_tp = np.load('C:/Users/dornier/GitHub/ConceptCells_TP/Semantic_Coding/repetition_effect/repetition_tp.npy')
+    repetition = np.load(path2data+'/data/Repetition_Effect/repetition_tp.npy')
 except:
-    repetition_tp = get_repetition_spikes('C:/Users/dornier/GitHub/ConceptCells_TP/dictionary_singleunits_tp.json')
-    np.save('C:/Users/dornier/GitHub/ConceptCells_TP/Semantic_Coding/repetition_effect/repetition_tp.npy',repetition_tp)
+    repetition = get_repetition_spikes('C:/Users/dornier/GitHub/ConceptCells_TP/dictionary_singleunits_tp.json')
+    np.save(path2data+'/data/Repetition_Effect/repetition_tp.npy',repetition)
 
 # Hstack repetition value, with first trial values first
-repetition_tp_stack = np.hstack(repetition_tp.T)
+repetition_tp_stack = np.hstack(repetition.T)
 
 # Create a vector corresponding to the # of the trial in array above
-id_trial = np.hstack(np.repeat(np.arange(8),np.shape(repetition_tp)[0]))
+id_trial = np.hstack(np.repeat(np.arange(8),np.shape(repetition)[0]))
 
 # Statistical test
 result = stats.linregress(repetition_tp_stack,id_trial)
 
-er
-print('Effet du numéro d essai: '+str(pvalue))
+
+print('Effect of trial numbers: r = '+str(result.rvalue)+', p = '+str(result.pvalue))
 fig, ax1 = plt.subplots(1,1,layout='constrained',figsize=(3.5,5))
-ax1 = sns.pointplot(repetition_tp,color='palevioletred')
+ax1 = sns.pointplot(repetition,color='palevioletred')
 ax1.set_xlabel('Trial number',fontsize=14)
 ax1.set_xticklabels(labels=['1','2','3','4','5','6','7','8'],fontsize=10)
 ax1.set_ylabel('Normalized spike count',fontsize=14)
-plt.savefig('C:/Users/dornier/PhD/Article/Concept_Cells_temporal_pole/Figures/Figure4/Repetition_Suppression/Norm_Spikes_Trial_TP_v2.svg')
+plt.savefig(path2save+'Effect_Repetition.svg')
 plt.show()
 plt.close()
