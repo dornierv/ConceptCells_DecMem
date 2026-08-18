@@ -3,11 +3,12 @@ Created by VD (13/06/2025)
 
 In this script we will plot the mean firing rate of each region (baseline corrected)
 To obtain informations about the time course of neuronal activity in each region
+
+This script is used to do Fig. 5a
 '''
+# Import libraries needed
 import warnings
 warnings.filterwarnings("ignore")
-
-# Import libraries needed
 import json 
 import re 
 import numpy as np
@@ -15,10 +16,12 @@ import os
 import pynapple as nap
 import matplotlib.pyplot as plt
 import mne
-
-
 from scipy import io as io
 from scipy import stats as stats
+
+# Inputs 
+path2database = 'C:/Users/dornier/GitHub/ConceptCells_DecMem/'
+path2figure = 'C:/Users/dornier/GitHub/ConceptCells_DecMem/data/Firing_Rate/'
 
 ###########################################################################
 ############ FUNCTIONS USED LATER IN THE MAIN SCRIPT ######################
@@ -125,7 +128,7 @@ def average_neurons(path_json):
 
 
             # Path where data is stored
-            data_path = r'F:\Screening\database/'+bsnm+'/sess-'+str(session)
+            data_path = path2database+'data/Examples_Session/'+bsnm+'/sess-'+str(session)
             path_images = data_path+'/stimuli/' #"E:/screening hors eeg/Screening images/Pool images/"
             
 
@@ -144,7 +147,7 @@ def average_neurons(path_json):
             spikes = load_spikes(data_path)
 
             # Load Run Lists and get TTL associated with each image
-            test_mat_Run1 = io.loadmat(path_images+'run-01.mat') # et concaténer les 4 runs
+            test_mat_Run1 = io.loadmat(path_images+'run-01.mat') 
             my_array_Run1 = test_mat_Run1['trial']
             keys_TTL = [my_array_Run1[0,i][1][0][0] for i in range(my_array_Run1.shape[1])] 
             values_images = [my_array_Run1[0,i][2][0] for i in range(my_array_Run1.shape[1])] 
@@ -264,50 +267,52 @@ def average_neurons(path_json):
 
 # Get the mean firing rate for all neurons in TP responsive
 try:
-    firingrate_tp = np.load('C:/Users/dornier/GitHub/ConceptCells_TP/TPvsHippocampus/Latencies/fr_tp.npy')
-    firing_tp_image = np.load('C:/Users/dornier/GitHub/ConceptCells_TP/TPvsHippocampus/Latencies/fr_tp_image.npy')
+    firingrate_tp = np.load(path2database+'data/Firing_Rate/FR_TP.npy')
+    neuron_tp = np.load(path2database+'data/Firing_Rate/FR_Neuron_TP.npy')
 except:
-    firingrate_tp, firing_tp_image = average_neurons(r"C:\Users\dornier\GitHub\ConceptCells_TP/dictionary_singleunits_tp.json")
-    np.save('C:/Users/dornier/GitHub/ConceptCells_TP/TPvsHippocampus/Latencies/fr_tp.npy',firingrate_tp)
-    np.save('C:/Users/dornier/GitHub/ConceptCells_TP/TPvsHippocampus/Latencies/fr_tp_image.npy',firing_tp_image)
+    neuron_tp,firingrate_tp = average_neurons(r"C:\Users\dornier\GitHub\ConceptCells_TP/dictionary_singleunits_tp.json")
+    np.save(path2database+'data/Firing_Rate/FR_TP.npy',firingrate_tp) # Firing rate for each image
+    np.save(path2database+'data/Firing_Rate/FR_Neuron_TP.npy',neuron_tp) # Mean firing rate for each neuron
 
 # Get the mean firing rate for all neurons in hippocampus responsive
 try:
-    firingrate_hippocampus = np.load('C:/Users/dornier/GitHub/ConceptCells_TP/TPvsHippocampus/Latencies/fr_hipp.npy')
-    firingrate_hippocampus_image = np.load('C:/Users/dornier/GitHub/ConceptCells_TP/TPvsHippocampus/Latencies/fr_hipp_image.npy')
+    firingrate_hippocampus = np.load(path2database+'data/Firing_Rate/FR_Hippocampus.npy')
+    neuron_hippocampus = np.load(path2database+'data/Firing_Rate/FR_Neuron_Hippocampus.npy')
 except:
-    firingrate_hippocampus,firingrate_hippocampus_image = average_neurons(r"C:\Users\dornier\GitHub\ConceptCells_TP/dictionary_singleunits_hippocampus.json")
-    np.save('C:/Users/dornier/GitHub/ConceptCells_TP/TPvsHippocampus/Latencies/fr_hipp.npy',firingrate_hippocampus)
-    np.save('C:/Users/dornier/GitHub/ConceptCells_TP/TPvsHippocampus/Latencies/fr_hipp_image.npy',firingrate_hippocampus_image)
+    neuron_hippocampus,firingrate_hippocampus = average_neurons(r"C:\Users\dornier\GitHub\ConceptCells_TP/dictionary_singleunits_hippocampus.json")
+    np.save(path2database+'data/Firing_Rate/FR_Hippocampus.npy',firingrate_hippocampus)
+    np.save(path2database+'data/Firing_Rate/FR_Neuron_Hippocampus.npy',neuron_hippocampus)
+    
+
 
 
 # Get the mean firing rate for all neurons in parahippocampal regions
 try:
-    firingrate_parahippocampal = np.load('C:/Users/dornier/GitHub/ConceptCells_TP/TPvsHippocampus/Latencies/fr_parahipp.npy')
-    firingrate_parahippocampal_image = np.load('C:/Users/dornier/GitHub/ConceptCells_TP/TPvsHippocampus/Latencies/fr_parahipp_image.npy')
+    firingrate_parahippocampal = np.load(path2database+'data/Firing_Rate/FR_Parahippocampal.npy')
+    neuron_parahippocampal = np.load(path2database+'data/Firing_Rate/FR_Neuron_Parahippocampal.npy')
 except:
-    firingrate_parahippocampal, firingrate_parahippocampal_image = average_neurons(r"C:\Users\dornier\GitHub\ConceptCells_TP/dictionary_singleunits_parahippocampal.json")
-    np.save('C:/Users/dornier/GitHub/ConceptCells_TP/TPvsHippocampus/Latencies/fr_parahipp.npy',firingrate_parahippocampal)
-    np.save('C:/Users/dornier/GitHub/ConceptCells_TP/TPvsHippocampus/Latencies/fr_parahipp_image.npy',firingrate_parahippocampal_image)
+    neuron_parahippocampal, firingrate_parahippocampal = average_neurons(r"C:\Users\dornier\GitHub\ConceptCells_TP/dictionary_singleunits_parahippocampal.json")
+    np.save(path2database+'data/Firing_Rate/FR_Parahippocampal.npy',firingrate_parahippocampal)
+    np.save(path2database+'data/Firing_Rate/FR_Neuron_Parahippocampal.npy',neuron_parahippocampal)
 
 
 # Get the mean firing rate for all neurons in posterior cingulate cortex
 try:
-    firingrate_pcc = np.load('C:/Users/dornier/GitHub/ConceptCells_TP/TPvsHippocampus/Latencies/fr_pcc.npy')
-    firingrate_pcc_image = np.load('C:/Users/dornier/GitHub/ConceptCells_TP/TPvsHippocampus/Latencies/fr_pcc_image.npy')
+    firingrate_pcc = np.load(path2database+'data/Firing_Rate/FR_PCC.npy')
+    neuron_pcc = np.load(path2database+'data/Firing_Rate/FR_Neuron_PCC.npy')
 except:
-    firingrate_pcc, firingrate_pcc_image = average_neurons(r"C:\Users\dornier\GitHub\ConceptCells_TP/dictionary_singleunits_pcc.json")
-    np.save('C:/Users/dornier/GitHub/ConceptCells_TP/TPvsHippocampus/Latencies/fr_pcc.npy',firingrate_pcc)
-    np.save('C:/Users/dornier/GitHub/ConceptCells_TP/TPvsHippocampus/Latencies/fr_pcc_image.npy',firingrate_pcc_image)
+    neuron_pcc,firingrate_pcc = average_neurons(r"C:\Users\dornier\GitHub\ConceptCells_TP/dictionary_singleunits_pcc.json")
+    np.save(path2database+'data/Firing_Rate/FR_PCC.npy',firingrate_pcc)
+    np.save(path2database+'data/Firing_Rate/FR_Neuron_PCC.npy',neuron_pcc)
 
 
 
 
 # Normalize data with baseline
-fr_tp_norm = (np.mean(firing_tp_image,axis=0)-np.mean(firing_tp_image[:,0:100]))/np.mean(firing_tp_image[:,0:100])
-fr_parahippocampal_norm = (np.mean(firingrate_parahippocampal_image,axis=0)-np.mean(firingrate_parahippocampal_image[:,0:100]))/np.mean(firingrate_parahippocampal_image[:,0:100])
-fr_hippocampus_norm = (np.mean(firingrate_hippocampus_image,axis=0) - np.mean(firingrate_hippocampus_image[:,0:100]))/np.mean(firingrate_hippocampus_image[:,0:100])
-fr_pcc_norm = (np.mean(firingrate_pcc_image,axis=0) - np.mean(firingrate_pcc_image[:,0:100]))/np.mean(firingrate_pcc_image[:,0:100])
+fr_tp_norm = (np.mean(firingrate_tp,axis=0)-np.mean(firingrate_tp[:,0:100]))/np.mean(firingrate_tp[:,0:100])
+fr_parahippocampal_norm = (np.mean(firingrate_parahippocampal,axis=0)-np.mean(firingrate_parahippocampal[:,0:100]))/np.mean(firingrate_parahippocampal[:,0:100])
+fr_hippocampus_norm = (np.mean(firingrate_hippocampus,axis=0) - np.mean(firingrate_hippocampus[:,0:100]))/np.mean(firingrate_hippocampus[:,0:100])
+fr_pcc_norm = (np.mean(firingrate_pcc,axis=0) - np.mean(firingrate_pcc[:,0:100]))/np.mean(firingrate_pcc[:,0:100])
 
 
 
@@ -323,10 +328,10 @@ ax.plot(x,fr_pcc_norm,color='cornflowerblue')
 
 
 # Find maximum for each ROI
-idx_max_tp = np.argmax(np.mean(firing_tp_image,axis=0))
-idx_max_parahipp = np.argmax(np.mean(firingrate_parahippocampal_image,axis=0))
-idx_max_hippocampus = np.argmax(np.mean(firingrate_hippocampus_image,axis=0))
-idx_max_pcc = np.argmax(np.mean(firingrate_pcc_image,axis=0))
+idx_max_tp = np.argmax(np.mean(firingrate_tp,axis=0))
+idx_max_parahipp = np.argmax(np.mean(firingrate_parahippocampal,axis=0))
+idx_max_hippocampus = np.argmax(np.mean(firingrate_hippocampus,axis=0))
+idx_max_pcc = np.argmax(np.mean(firingrate_pcc,axis=0))
 
 
 # Plot vertical line where the maximum value is
@@ -337,41 +342,40 @@ ax.vlines(x[idx_max_pcc],ymin =0, ymax=np.max(fr_pcc_norm),color='cornflowerblue
 
  
 
-ax.legend(['Parahippocampal (n = '+ str(np.shape(firingrate_parahippocampal)[0]) + ')',
-           'Temporal pole (n = ' + str(np.shape(firingrate_tp)[0]) + ')',
-           'Hippocampus (n = '+ str(np.shape(firingrate_hippocampus)[0]) + ')',
-           'PCC (n = '+ str(np.shape(firingrate_pcc)[0]) + ')'],
+ax.legend(['Parahippocampal (n = '+ str(np.shape(neuron_parahippocampal)[0]) + ')',
+           'Temporal pole (n = ' + str(np.shape(neuron_tp)[0]) + ')',
+           'Hippocampus (n = '+ str(np.shape(neuron_hippocampus)[0]) + ')',
+           'PCC (n = '+ str(np.shape(neuron_pcc)[0]) + ')'],
            loc='upper left',
            fontsize=12)
 
 
 # Add SEM around mean activity
-ax.fill_between(x,fr_tp_norm+stats.sem(firing_tp_image),
-                fr_tp_norm-stats.sem(firing_tp_image),
+ax.fill_between(x,fr_tp_norm+stats.sem(firingrate_tp),
+                fr_tp_norm-stats.sem(firingrate_tp),
                 color='palevioletred',alpha=0.4)
 
-ax.fill_between(x,fr_hippocampus_norm+stats.sem(firingrate_hippocampus_image),
-                fr_hippocampus_norm-stats.sem(firingrate_hippocampus_image),
+ax.fill_between(x,fr_hippocampus_norm+stats.sem(firingrate_hippocampus),
+                fr_hippocampus_norm-stats.sem(firingrate_hippocampus),
                 color='darkslateblue',alpha=0.4)
 
 
 
-ax.fill_between(x,fr_parahippocampal_norm+stats.sem(firingrate_parahippocampal_image),
-                fr_parahippocampal_norm-stats.sem(firingrate_parahippocampal_image),
+ax.fill_between(x,fr_parahippocampal_norm+stats.sem(firingrate_parahippocampal),
+                fr_parahippocampal_norm-stats.sem(firingrate_parahippocampal),
                 color='sandybrown',alpha=0.4)
 
 
 
-ax.fill_between(x,fr_pcc_norm+stats.sem(firingrate_pcc_image),
-                fr_pcc_norm-stats.sem(firingrate_pcc_image),
+ax.fill_between(x,fr_pcc_norm+stats.sem(firingrate_pcc),
+                fr_pcc_norm-stats.sem(firingrate_pcc),
                 color='cornflowerblue',alpha=0.4)
 ax.set_xlim(-0.5,1)
 ax.set_title('Grand average of firing rates',fontsize=16)
 
 ax.set_xlabel('Time (s)',fontsize=14)
 ax.set_ylabel('Neuronal activity - Baseline corrected',fontsize=14)
-plt.savefig('C:/Users/dornier/PhD/Article/Concept_Cells_temporal_pole/Figures/Figure5/Latency/Time_Course_Normalized_Neurons_AllROI_v4.svg')
-plt.savefig('C:/Users/dornier/PhD/Article/Concept_Cells_temporal_pole/Figures/Figure5/Latency/Time_Course_Normalized_Neurons_AllROI_v4.pdf')
+plt.savefig(path2figure+'/FiringRate_AllNeurons_ROI.svg')
 plt.show()
 
 # Print timing of maximum firing rate
