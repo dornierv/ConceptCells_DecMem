@@ -59,7 +59,12 @@ If recomputing the analyses on the subset of data provided then functions run in
 
 ### Data files
 
-In the subfolder data you can find an example from one session with the necessary data to test function developed.
+Data are available on this address: https://sdrive.cnrs.fr/s/EqkFMFrWNaA98eC
+
+In there please download the folder *data* that contains all data to run scripts available on the Git-Hub repository.
+Put the folder *data* on the same level as the folder *scripts* from Git-Hub.
+
+In the subfolder data you can find an example from one session with the necessary data to test function developed (Examples_Session).
 
 And you'll also find the preprocess data from the entire database enabling replicating plots and statistical analyses of the manuscript.
 Each of them is placed in the sub-folder associated with the analyses.
