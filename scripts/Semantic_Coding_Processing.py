@@ -25,11 +25,19 @@ import mne
 from scipy.spatial.distance import cosine
 from gensim.models import Word2Vec
 
+
+# Inputs
 # Path where word2vec by Google is stored
-path = 'C:/Users/dornier/PhD/ConceptCells_Analysis/Semantic_Coding/word2vec/GoogleNews-vectors-negative300.bin.gz'
+# Can be downloaded here: https://github.com/mmihaltz/word2vec-googlenews-vectors
+path2word2vec = 'C:/Users/dornier/PhD/ConceptCells_Analysis/Semantic_Coding/word2vec/GoogleNews-vectors-negative300.bin.gz'
+path2data = 'C:/Users/dornier/GitHub/ConceptCells_DecMem/'
+path2save = 'C:/Users/dornier/GitHub/ConceptCells_DecMem/data/Semantic_Coding/'
+
+ROI = 'GPH' # Or TP, Hipp, PCC
+plot=1 # Put = 0 if don't want to plot 
 
 # Load model (here word2vec)
-model = KeyedVectors.load_word2vec_format(path, binary=True)
+model = KeyedVectors.load_word2vec_format(path2word2vec, binary=True)
 
 
 
@@ -122,7 +130,7 @@ def word2vec_correlation(id_patient,id_session,model):
         Array containing the label of the words sorted by groups
     '''
     # Path to the database where words labels are stored
-    path_database = 'C:/Users/dornier/GitHub/ConceptCells_TP/Semantic_Coding/database/'+id_patient+'/'+id_session+'/'
+    path_database = path2data+'data/Examples_Session/'+id_patient+'/'+id_session+'/stimuli/'
 
 
     # Load the labels of each pictures in a dataframe
@@ -199,13 +207,10 @@ def corr_firingrate(id_patient,id_session,id_neuron):
     # Get the correlation between firing rate 
 
     # Path where your neuronal data are stored
-    data_path = 'F:/Screening/database/'+id_patient+'/'+id_session+'/'
+    data_path = path2data+'/data/Examples_Session/'+id_patient+'/'+id_session+'/'
 
     # Path where stimuli and run lists are stored
     path_images = data_path+'stimuli/'
-
- 
-
 
     # Load logfile
     logfname=data_path+'lfps/'+id_patient+'_ses-01_task-Screening_run-01_ieeg_log.txt'
@@ -227,7 +232,7 @@ def corr_firingrate(id_patient,id_session,id_neuron):
 
 
     # Load label used for word2vec to get ttl associated
-    path_database_word2vec = 'C:/Users/dornier/GitHub/ConceptCells_TP/Semantic_Coding/database/'+id_patient+'/'+id_session +'/'
+    path_database_word2vec = path2data+'/data/Examples_Session/'+id_patient+'/'+id_session +'/stimuli/'
 
     # Open csv file containing word2vec labels
     try:
@@ -394,7 +399,7 @@ def reorder_fr_category(id_patient,id_session,firingrate_og,name_image):
     
     '''
     # Path where you create your database with semantic conditions
-    path_semantic_vector = 'C:/Users/dornier/GitHub/ConceptCells_TP/Semantic_Coding/database/'+id_patient+'/sess-'+str(id_session)+'/'
+    path_semantic_vector = path2data+'/data/Examples_Session/'+id_patient+'/sess-'+str(id_session)+'/'
 
     # Load the semantic vector into a dataframe
     semantic_vector = pd.read_csv(path_semantic_vector+'Semantic_Category_Stimuli.csv',header=0,sep=';')
@@ -445,12 +450,10 @@ def reorder_fr_category(id_patient,id_session,firingrate_og,name_image):
 #### MAIN SCRIPT ####
 #####################
 
-# Inputs
-ROI = 'GPH' # Or TP, Hipp, PCC
-plot=1 # Put = 0 if don't want to plot 
+
 
 # Open the dictionary containing all single-units registered in ROI
-path_json = 'C:/Users/dornier/GitHub/ConceptCells_TP/Semantic_Coding/dictionary_singleunits_parahippocampal_semanticcoding.json'
+path_json = 'C:/Users/dornier/GitHub/ConceptCells_DecMem/data/Examples_Session/dictionary_singleunits_example.json'
 with open(path_json, "r") as f:
     neurons_tp = json.load(f)
 
@@ -657,11 +660,10 @@ for patient in list_patient:
 
 
 
-                        plt.savefig('C:/Users/dornier/PhD/Article/Concept_Cells_temporal_pole/Figures/Figure3/Correlation_Ordered/V1_Responsive/gph/Corr_W2V_Cosine_'+
+                        plt.savefig(path2save+'/Semantic_Coding_'+
                                     str(id_patient)+'_'+str(id_session)+'_neuron-'+str(iNeurone)+'.svg')
                         
-                        plt.savefig('C:/Users/dornier/PhD/Article/Concept_Cells_temporal_pole/Figures/Figure3/Correlation_Ordered/V1_Responsive/gph/AAA_Corr_W2V_Cosine_'+
-                                    str(id_patient)+'_'+str(id_session)+'_neuron-'+str(iNeurone)+'.jpg')
+    
 
                         plt.close()
                     
@@ -698,7 +700,7 @@ for patient in list_patient:
 
 # Save the data from our entire database
 df = pd.DataFrame(d)
-df.to_csv('C:/Users/dornier/PhD/Article/Concept_Cells_temporal_pole/Figures/Figure3/Correlation_Ordered/Correlation_Cosine_word2vec_AllDatabase_v1_Responsive_'+ROI+'.csv')
+df.to_csv(path2save+'/Semantic_Coding_'+ROI+'.csv')
 
 
 print("All done")
