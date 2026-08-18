@@ -23,7 +23,7 @@ https://www.aptech.com/blog/permutation-entropy/
 This script is used to generate Extended Data Fig. 7a
 
 '''
-
+# Import libraries
 import EntropyHub as entropy
 import pynapple as nap
 import json
@@ -34,9 +34,17 @@ import re
 import matplotlib.pyplot as plt
 import seaborn as sns
 import scipy.stats as stats
-
 import math
 np.math = math
+
+# Inputs
+path2data = 'C:/Users/dornier/GitHub/ConceptCells_DecMem/'
+path2save = 'C:/Users/dornier/GitHub/ConceptCells_DecMem/data/Spiking_Variability/'
+
+
+###################
+#### FUNCTIONS ####
+###################
 
 def read_lines(filename, removeEndLines=False, str2Split='\n', dtype=str):
     """
@@ -110,7 +118,7 @@ def get_permutation_entropy(path_json):
 
 
             # Path where data is stored
-            data_path = r'F:\Screening\database/'+bsnm+'/'+iSession
+            data_path = path2data+'/data/Examples_Session/'+bsnm+'/'+iSession
             path_images = data_path+'/stimuli/' #"E:/screening hors eeg/Screening images/Pool images/"
             
 
@@ -156,8 +164,6 @@ def get_permutation_entropy(path_json):
             # Otherwise, remove bad TTLs
             imgs=np.unique(TTLvals)
             imgIndices=[np.where(TTLvals==img_)[0] for img_ in imgs]
-
-
             imgTS=[TS_32768[imgIndice] for imgIndice in imgIndices]
 
             # Suppress the first value that correspond to TTL = 0 (i.e., fixation cross)
@@ -214,82 +220,46 @@ def get_permutation_entropy(path_json):
                     pe4_meanNeuron.append(np.nanmean(PE4))
                     
                         
-    return PEnorm2, PEnorm3, PEnorm4, pe4_meanNeuron
+    return pe4_meanNeuron
                         
 
             
 # Compute the permutation entropy for temporopolar regions 
 try: 
-    tp_pe2 = np.load('C:/Users/dornier/PhD/Article/Concept_Cells_temporal_pole/Figures/Figure5/Permutation_Entropy/tp_pe2.npy')
-    tp_pe3 = np.load('C:/Users/dornier/PhD/Article/Concept_Cells_temporal_pole/Figures/Figure5/Permutation_Entropy/tp_pe3.npy')
-    tp_pe4 = np.load('C:/Users/dornier/PhD/Article/Concept_Cells_temporal_pole/Figures/Figure5/Permutation_Entropy/tp_pe4.npy')
-    tp_meanpe4 = np.load('C:/Users/dornier/PhD/Article/Concept_Cells_temporal_pole/Figures/Figure5/Permutation_Entropy/tp_meanpe4.npy')
+
+    tp_pe = np.load(path2data+'/data/Spiking_Variability/Permutation_Entropy_TP.npy')
 except:
-    tp_pe2, tp_pe3, tp_pe4, tp_meanpe4 = get_permutation_entropy(r'C:\Users\dornier\GitHub\ConceptCells_TP/dictionary_singleunits_tp.json')
-    np.save('C:/Users/dornier/PhD/Article/Concept_Cells_temporal_pole/Figures/Figure5/Permutation_Entropy/tp_pe2.npy',tp_pe2)
-    np.save('C:/Users/dornier/PhD/Article/Concept_Cells_temporal_pole/Figures/Figure5/Permutation_Entropy/tp_pe3.npy',tp_pe3)
-    np.save('C:/Users/dornier/PhD/Article/Concept_Cells_temporal_pole/Figures/Figure5/Permutation_Entropy/tp_pe4.npy',tp_pe4)
-    np.save('C:/Users/dornier/PhD/Article/Concept_Cells_temporal_pole/Figures/Figure5/Permutation_Entropy/tp_meanpe4.npy',tp_meanpe4)
+    tp_pe = get_permutation_entropy(r'C:\Users\dornier\GitHub\ConceptCells_TP/dictionary_singleunits_tp.json')
+    np.save(path2data+'/data/Spiking_Variability/Permutation_Entropy_TP.npy',tp_pe)
 
 
 
 # Compute the permutation entropy for hippocampus
 try: 
-    hipp_pe2 = np.load('C:/Users/dornier/PhD/Article/Concept_Cells_temporal_pole/Figures/Figure5/Permutation_Entropy/hipp_pe2.npy')
-    hipp_pe3 = np.load('C:/Users/dornier/PhD/Article/Concept_Cells_temporal_pole/Figures/Figure5/Permutation_Entropy/hipp_pe3.npy')
-    hipp_pe4 = np.load('C:/Users/dornier/PhD/Article/Concept_Cells_temporal_pole/Figures/Figure5/Permutation_Entropy/hipp_pe4.npy')
-    hipp_meanpe4 = np.load('C:/Users/dornier/PhD/Article/Concept_Cells_temporal_pole/Figures/Figure5/Permutation_Entropy/hipp_meanpe4.npy')
+    hipp_pe = np.load(path2data+'/data/Spiking_Variability/Permutation_Entropy_Hippocampus.npy')
 except:
-    hipp_pe2, hipp_pe3, hipp_pe4, hipp_meanpe4 = get_permutation_entropy(r'C:\Users\dornier\GitHub\ConceptCells_TP/dictionary_singleunits_hippocampus.json')
-    np.save('C:/Users/dornier/PhD/Article/Concept_Cells_temporal_pole/Figures/Figure5/Permutation_Entropy/hipp_pe2.npy',hipp_pe2)
-    np.save('C:/Users/dornier/PhD/Article/Concept_Cells_temporal_pole/Figures/Figure5/Permutation_Entropy/hipp_pe3.npy',hipp_pe3)
-    np.save('C:/Users/dornier/PhD/Article/Concept_Cells_temporal_pole/Figures/Figure5/Permutation_Entropy/hipp_pe4.npy',hipp_pe4)
-    np.save('C:/Users/dornier/PhD/Article/Concept_Cells_temporal_pole/Figures/Figure5/Permutation_Entropy/hipp_meanpe4.npy',hipp_meanpe4)
+    hipp_pe = get_permutation_entropy(r'C:\Users\dornier\GitHub\ConceptCells_TP/dictionary_singleunits_hippocampus.json')
+    np.save(path2data+'/data/Spiking_Variability/Permutation_Entropy_Hippocampus.npy',hipp_pe)
 
 
 
-
-# Compute the permutation entropy for rhinal cortex
-try: 
-    rhinal_pe2 = np.load('C:/Users/dornier/PhD/Article/Concept_Cells_temporal_pole/Figures/Figure5/Permutation_Entropy/rhinal_pe2.npy')
-    rhinal_pe3 = np.load('C:/Users/dornier/PhD/Article/Concept_Cells_temporal_pole/Figures/Figure5/Permutation_Entropy/rhinal_pe3.npy')
-    rhinal_pe4 = np.load('C:/Users/dornier/PhD/Article/Concept_Cells_temporal_pole/Figures/Figure5/Permutation_Entropy/rhinal_pe4.npy')
-    rhinal_meanpe4 = np.load('C:/Users/dornier/PhD/Article/Concept_Cells_temporal_pole/Figures/Figure5/Permutation_Entropy/rhinal_meanpe4.npy')
-except:
-    rhinal_pe2, rhinal_pe3, rhinal_pe4, rhinal_meanpe4 = get_permutation_entropy(r'C:\Users\dornier\GitHub\ConceptCells_TP/dictionary_singleunits_rhinal_cortex.json')
-    np.save('C:/Users/dornier/PhD/Article/Concept_Cells_temporal_pole/Figures/Figure5/Permutation_Entropy/rhinal_pe2.npy',rhinal_pe2)
-    np.save('C:/Users/dornier/PhD/Article/Concept_Cells_temporal_pole/Figures/Figure5/Permutation_Entropy/rhinal_pe3.npy',rhinal_pe3)
-    np.save('C:/Users/dornier/PhD/Article/Concept_Cells_temporal_pole/Figures/Figure5/Permutation_Entropy/rhinal_pe4.npy',rhinal_pe4)
-    np.save('C:/Users/dornier/PhD/Article/Concept_Cells_temporal_pole/Figures/Figure5/Permutation_Entropy/rhinal_meanpe4.npy',rhinal_meanpe4)
 
 
 # Compute the permutation entropy for parahippocampal cortex
 try: 
-    gph_pe2 = np.load('C:/Users/dornier/PhD/Article/Concept_Cells_temporal_pole/Figures/Figure5/Permutation_Entropy/gph_pe2.npy')
-    gph_pe3 = np.load('C:/Users/dornier/PhD/Article/Concept_Cells_temporal_pole/Figures/Figure5/Permutation_Entropy/gph_pe3.npy')
-    gph_pe4 = np.load('C:/Users/dornier/PhD/Article/Concept_Cells_temporal_pole/Figures/Figure5/Permutation_Entropy/gph_pe4.npy')
-    gph_meanpe4 = np.load('C:/Users/dornier/PhD/Article/Concept_Cells_temporal_pole/Figures/Figure5/Permutation_Entropy/gph_meanpe4.npy')
+    gph_pe = np.load(path2data+'/data/Spiking_Variability/Permutation_Entropy_Parahippocampal.npy')
 except:
-    gph_pe2, gph_pe3, gph_pe4, gph_meanpe4 = get_permutation_entropy(r'C:\Users\dornier\GitHub\ConceptCells_TP/dictionary_singleunits_parahippocampal.json')
-    np.save('C:/Users/dornier/PhD/Article/Concept_Cells_temporal_pole/Figures/Figure5/Permutation_Entropy/gph_pe2.npy',gph_pe2)
-    np.save('C:/Users/dornier/PhD/Article/Concept_Cells_temporal_pole/Figures/Figure5/Permutation_Entropy/gph_pe3.npy',gph_pe3)
-    np.save('C:/Users/dornier/PhD/Article/Concept_Cells_temporal_pole/Figures/Figure5/Permutation_Entropy/gph_pe4.npy',gph_pe4)
-    np.save('C:/Users/dornier/PhD/Article/Concept_Cells_temporal_pole/Figures/Figure5/Permutation_Entropy/gph_meanpe4.npy',gph_meanpe4)
+    gph_pe = get_permutation_entropy(r'C:\Users\dornier\GitHub\ConceptCells_TP/dictionary_singleunits_parahippocampal.json')
+    np.save(path2data+'/data/Spiking_Variability/Permutation_Entropy_Parahippocampal.npy',gph_pe)
 
 
 
 # Compute the permutation entropy for pcc
 try: 
-    pcc_pe2 = np.load('C:/Users/dornier/PhD/Article/Concept_Cells_temporal_pole/Figures/Figure5/Permutation_Entropy/pcc_pe2.npy')
-    pcc_pe3 = np.load('C:/Users/dornier/PhD/Article/Concept_Cells_temporal_pole/Figures/Figure5/Permutation_Entropy/pcc_pe3.npy')
-    pcc_pe4 = np.load('C:/Users/dornier/PhD/Article/Concept_Cells_temporal_pole/Figures/Figure5/Permutation_Entropy/pcc_pe4.npy')
-    pcc_meanpe4 = np.load('C:/Users/dornier/PhD/Article/Concept_Cells_temporal_pole/Figures/Figure5/Permutation_Entropy/pcc_meanpe4.npy')
+    pcc_pe = np.load(path2data+'/data/Spiking_Variability/Permutation_Entropy_PCC.npy')
 except:
-    pcc_pe2, pcc_pe3, pcc_pe4, pcc_meanpe4 = get_permutation_entropy(r'C:\Users\dornier\GitHub\ConceptCells_TP/dictionary_singleunits_pcc.json')
-    np.save('C:/Users/dornier/PhD/Article/Concept_Cells_temporal_pole/Figures/Figure5/Permutation_Entropy/pcc_pe2.npy',pcc_pe2)
-    np.save('C:/Users/dornier/PhD/Article/Concept_Cells_temporal_pole/Figures/Figure5/Permutation_Entropy/pcc_pe3.npy',pcc_pe3)
-    np.save('C:/Users/dornier/PhD/Article/Concept_Cells_temporal_pole/Figures/Figure5/Permutation_Entropy/pcc_pe4.npy',pcc_pe4)
-    np.save('C:/Users/dornier/PhD/Article/Concept_Cells_temporal_pole/Figures/Figure5/Permutation_Entropy/pcc_meanpe4.npy',pcc_meanpe4)
+    pcc_pe = get_permutation_entropy(r'C:\Users\dornier\GitHub\ConceptCells_TP/dictionary_singleunits_pcc.json')
+    np.save(path2data+'/data/Spiking_Variability/Permutation_Entropy_PCC.npy',pcc_pe)
 
 
 
@@ -301,10 +271,10 @@ except:
 fig, (ax1,ax2,ax3,ax4) = plt.subplots(1,4,layout='constrained',figsize=(7,5),sharex=True)
 
 
-ax1 = sns.violinplot(tp_meanpe4,ax=ax1,color='palevioletred')
-ax2 = sns.violinplot(hipp_meanpe4,ax=ax2,color='darkslateblue')
-ax3 = sns.violinplot(gph_meanpe4,ax=ax3,color='sandybrown')
-ax4 = sns.violinplot(pcc_meanpe4,ax=ax4,color='cornflowerblue')
+ax1 = sns.violinplot(tp_pe,ax=ax1,color='palevioletred')
+ax2 = sns.violinplot(hipp_pe,ax=ax2,color='darkslateblue')
+ax3 = sns.violinplot(gph_pe,ax=ax3,color='sandybrown')
+ax4 = sns.violinplot(pcc_pe,ax=ax4,color='cornflowerblue')
 
 
 
@@ -344,7 +314,7 @@ for s in spines:
 
 ax1.set_ylabel('Permutation entropy value normalized',fontsize=12)
 
-plt.savefig('C:/Users/dornier/PhD/Article/Concept_Cells_temporal_pole/Figures/Supplementary_Figure/Permutation_Entropy/Permutation_Entropy_All_ROI_v2.svg')
+plt.savefig(path2save+'/Permutation_Entropy_All_ROI.svg')
 
 plt.show()
 
